@@ -56,14 +56,14 @@
   .timeline-track { position: relative; height: 64px; border-radius: 8px; overflow: visible; cursor: crosshair; user-select: none; touch-action: none; }
   .track-bg { position: absolute; inset: 0; background: var(--bg3); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
   #waveform-canvas { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 8px; }
-  .selection-mask-left, .selection-mask-right { position: absolute; top: 0; height: 100%; background: rgba(0,0,0,0.6); pointer-events: none; border-radius: 8px 0 0 8px; }
+  .selection-mask-left, .selection-mask-right { position: absolute; top: 0; height: 100%; background: rgba(0,0,0,0.6); pointer-events: none; }
+  .selection-mask-left { border-radius: 8px 0 0 8px; }
   .selection-mask-right { border-radius: 0 8px 8px 0; }
   .selection-highlight { position: absolute; top: 0; height: 100%; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); pointer-events: none; background: rgba(232,255,71,0.06); }
   .handle { position: absolute; top: -4px; width: 28px; height: calc(100% + 8px); cursor: ew-resize; z-index: 20; display: flex; align-items: center; justify-content: center; transform: translateX(-50%); touch-action: none; }
   .handle-bar { width: 4px; height: 100%; border-radius: 2px; }
   #handle-start .handle-bar { background: var(--accent); }
   #handle-end .handle-bar { background: var(--red); }
-  .handle:active { cursor: grabbing; }
   .playhead-line { position: absolute; top: -6px; width: 2px; height: calc(100% + 12px); background: #fff; pointer-events: none; z-index: 15; transform: translateX(-50%); opacity: 0.6; }
   .playhead-dot { width: 8px; height: 8px; background: #fff; border-radius: 50%; position: absolute; top: -1px; left: 50%; transform: translateX(-50%); }
 
@@ -72,33 +72,31 @@
   .btn-play:hover { background: var(--accent2); transform: scale(1.05); }
   .btn-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--bg3); border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; color: var(--text2); font-size: 16px; }
   .btn-icon:hover { border-color: var(--border2); color: var(--text); }
-  .playback-time { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text2); margin-left: 4px; }
+  .playback-time { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text2); }
   .speed-select { font-family: 'DM Mono', monospace; font-size: 12px; background: var(--bg3); border: 1px solid var(--border); color: var(--text2); padding: 6px 10px; border-radius: 8px; cursor: pointer; outline: none; margin-left: auto; }
 
   .export-panel { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); gap: 12px; flex-wrap: wrap; }
   .clip-info { font-size: 13px; color: var(--text2); }
   .clip-info strong { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 14px; }
-  .btn-export { display: flex; align-items: center; gap: 8px; background: var(--accent); color: #0d0d0f; border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .btn-export { display: flex; align-items: center; gap: 8px; background: var(--accent); color: #0d0d0f; border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
   .btn-export:hover { background: var(--accent2); transform: translateY(-1px); }
   .btn-export:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-  /* FFmpeg loading / progress */
   #status-bar { display: none; flex-direction: column; gap: 8px; }
   #status-bar.active { display: flex; }
   .status-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); font-family: 'DM Mono', monospace; }
   .progress-bar-wrap { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
   .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; width: 0%; transition: width 0.3s; }
 
-  .hint { font-size: 12px; color: var(--text3); text-align: center; padding: 4px 0; font-family: 'DM Mono', monospace; letter-spacing: 0.3px; }
+  .hint { font-size: 12px; color: var(--text3); text-align: center; padding: 4px 0; font-family: 'DM Mono', monospace; }
 
-  footer { padding: 1rem 2rem; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; text-align: center; letter-spacing: 0.5px; }
+  footer { padding: 1rem 2rem; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; text-align: center; }
 
   @media (max-width: 600px) {
     main { padding: 1rem; }
     .handle { width: 36px; }
     .timeline-track { height: 72px; }
     .time-badge { font-size: 11px; padding: 3px 7px; }
-    .hint { font-size: 11px; }
   }
 </style>
 </head>
@@ -123,7 +121,7 @@
       <span class="file-name" id="file-name-display">video.mp4</span>
       <button class="btn-change" onclick="resetEditor()">✕ Change file</button>
     </div>
-    <div class="video-wrap"><video id="video" preload="metadata"></video></div>
+    <div class="video-wrap"><video id="video" preload="metadata" playsinline></video></div>
 
     <div class="timeline-section">
       <div class="timeline-header">
@@ -168,58 +166,94 @@
 
     <div id="status-bar">
       <div class="status-row">
-        <span id="status-text">Loading FFmpeg…</span>
-        <span id="status-pct">0%</span>
+        <span id="status-text">Loading…</span>
+        <span id="status-pct"></span>
       </div>
       <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill"></div></div>
     </div>
 
-    <div class="hint">Drag the yellow (start) and red (end) handles · Export is near-instant with FFmpeg</div>
+    <div class="hint">Drag yellow = start · red = end · Export is fast, no re-encoding</div>
   </div>
 </main>
 
 <footer>Runs entirely in your browser — your video never leaves your device</footer>
 
-<script type="module">
-import { FFmpeg } from 'https://esm.sh/@ffmpeg/ffmpeg@0.12.10';
-import { fetchFile, toBlobURL } from 'https://esm.sh/@ffmpeg/util@0.12.1';
-
-const video = document.getElementById('video');
+<script>
+// ── globals ──────────────────────────────────────────────────────────────────
+const video   = document.getElementById('video');
 const fileInput = document.getElementById('file-input');
-const dropZone = document.getElementById('drop-zone');
-const editor = document.getElementById('editor');
-const timeline = document.getElementById('timeline');
+const dropZone  = document.getElementById('drop-zone');
+const editor    = document.getElementById('editor');
+const timeline  = document.getElementById('timeline');
 const handleStart = document.getElementById('handle-start');
-const handleEnd = document.getElementById('handle-end');
-const playhead = document.getElementById('playhead');
+const handleEnd   = document.getElementById('handle-end');
+const playhead    = document.getElementById('playhead');
 const selHighlight = document.getElementById('sel-highlight');
-const maskLeft = document.getElementById('mask-left');
+const maskLeft  = document.getElementById('mask-left');
 const maskRight = document.getElementById('mask-right');
 const waveCanvas = document.getElementById('waveform-canvas');
-const waveCtx = waveCanvas.getContext('2d');
+const waveCtx    = waveCanvas.getContext('2d');
 
 let startTime = 0, endTime = 0, duration = 0;
 let dragging = null, dragStartX = 0, dragStartTime = 0;
 let objectURL = null, currentFile = null;
-let ffmpeg = null, ffmpegReady = false;
+let ffmpegLoaded = false, ffmpegLoading = false;
+let ffmpegInstance = null;
 
-// Load FFmpeg in background
-async function loadFFmpeg() {
+// ── FFmpeg lazy load ─────────────────────────────────────────────────────────
+async function ensureFFmpeg() {
+  if (ffmpegLoaded) return true;
+  if (ffmpegLoading) {
+    // wait for it
+    while (ffmpegLoading) await sleep(200);
+    return ffmpegLoaded;
+  }
+  ffmpegLoading = true;
+  setStatus('Loading FFmpeg (one-time, ~10 MB)…', 5);
   try {
-    ffmpeg = new FFmpeg();
-    const baseURL = 'https://esm.sh/@ffmpeg/core@0.12.6/dist/esm';
-    await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+    // Load from unpkg — very reliable CDN
+    await loadScript('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js');
+    await loadScript('https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js');
+
+    const { FFmpeg } = window.FFmpegWASM;
+    const { fetchFile, toBlobURL } = window.FFmpegUtil;
+    window._fetchFile = fetchFile;
+
+    ffmpegInstance = new FFmpeg();
+    ffmpegInstance.on('progress', ({ progress }) => {
+      const p = Math.round(20 + Math.min(progress, 1) * 75);
+      setStatus('Trimming… ' + p + '%', p);
     });
-    ffmpegReady = true;
-  } catch(e) {
-    console.warn('FFmpeg failed to load:', e);
+
+    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+    setStatus('Loading FFmpeg core…', 10);
+    await ffmpegInstance.load({
+      coreURL: await toBlobURL(baseURL + '/ffmpeg-core.js',   'text/javascript'),
+      wasmURL: await toBlobURL(baseURL + '/ffmpeg-core.wasm', 'application/wasm'),
+    });
+
+    ffmpegLoaded = true;
+    ffmpegLoading = false;
+    return true;
+  } catch (e) {
+    ffmpegLoading = false;
+    console.error('FFmpeg load error:', e);
+    return false;
   }
 }
-loadFFmpeg();
 
-// File handling
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector('script[src="' + src + '"]')) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── File handling ─────────────────────────────────────────────────────────────
 fileInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
@@ -244,67 +278,65 @@ video.addEventListener('loadedmetadata', () => {
   duration = video.duration;
   startTime = 0; endTime = duration;
   updateTimeline(); drawWaveform();
+  // Pre-load FFmpeg in background so export is instant
+  ensureFFmpeg();
 });
 
 video.addEventListener('timeupdate', () => {
-  const pct = duration ? (video.currentTime / duration) * 100 : 0;
-  playhead.style.left = pct + '%';
-  document.getElementById('playback-time').textContent = fmtSimple(video.currentTime) + ' / ' + fmtSimple(duration);
+  if (!duration) return;
+  playhead.style.left = (video.currentTime / duration * 100) + '%';
+  document.getElementById('playback-time').textContent =
+    fmtSimple(video.currentTime) + ' / ' + fmtSimple(duration);
   if (video.currentTime >= endTime && !video.paused) {
     video.pause(); video.currentTime = endTime;
     document.getElementById('btn-play').textContent = '▶';
   }
 });
 
-window.resetEditor = function() {
+function resetEditor() {
   if (objectURL) URL.revokeObjectURL(objectURL);
   video.src = ''; fileInput.value = '';
   editor.classList.remove('active');
   dropZone.style.display = '';
   document.getElementById('status-bar').classList.remove('active');
-};
+}
 
-// Timeline
-function timeToPercent(t) { return duration ? (t / duration) * 100 : 0; }
-
+// ── Timeline ──────────────────────────────────────────────────────────────────
 function updateTimeline() {
-  const sp = timeToPercent(startTime), ep = timeToPercent(endTime);
+  const sp = pct(startTime), ep = pct(endTime);
   handleStart.style.left = sp + '%';
-  handleEnd.style.left = ep + '%';
-  selHighlight.style.left = sp + '%';
+  handleEnd.style.left   = ep + '%';
+  selHighlight.style.left  = sp + '%';
   selHighlight.style.width = (ep - sp) + '%';
-  maskLeft.style.left = '0'; maskLeft.style.width = sp + '%';
-  maskRight.style.left = ep + '%'; maskRight.style.width = (100 - ep) + '%';
-  const clipDur = (endTime - startTime).toFixed(1);
+  maskLeft.style.width  = sp + '%';
+  maskRight.style.left  = ep + '%';
+  maskRight.style.width = (100 - ep) + '%';
+  const d = (endTime - startTime).toFixed(1);
   document.getElementById('start-badge').textContent = fmt(startTime);
-  document.getElementById('end-badge').textContent = fmt(endTime);
-  document.getElementById('clip-dur').textContent = '→ ' + clipDur + 's';
-  document.getElementById('export-dur-display').textContent = clipDur + 's';
-  document.getElementById('export-range-text').textContent = '(' + fmtSimple(startTime) + ' – ' + fmtSimple(endTime) + ')';
+  document.getElementById('end-badge').textContent   = fmt(endTime);
+  document.getElementById('clip-dur').textContent    = '→ ' + d + 's';
+  document.getElementById('export-dur-display').textContent = d + 's';
+  document.getElementById('export-range-text').textContent  =
+    '(' + fmtSimple(startTime) + ' – ' + fmtSimple(endTime) + ')';
 }
 
-function getClientX(e) {
-  if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
-  if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientX;
+function pct(t) { return duration ? (t / duration) * 100 : 0; }
+
+function getX(e) {
+  if (e.touches && e.touches.length)        return e.touches[0].clientX;
+  if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
   return e.clientX;
-}
-
-function onTimelinePointer(e) {
-  if (dragging) return;
-  const rect = timeline.getBoundingClientRect();
-  const t = Math.max(0, Math.min(duration, ((getClientX(e) - rect.left) / rect.width) * duration));
-  if (t >= startTime && t <= endTime) video.currentTime = t;
 }
 
 function startDrag(e, which) {
   e.stopPropagation(); e.preventDefault();
   dragging = which;
-  dragStartX = getClientX(e);
+  dragStartX    = getX(e);
   dragStartTime = which === 'start' ? startTime : endTime;
-  document.addEventListener('mousemove', onDrag);
-  document.addEventListener('mouseup', stopDrag);
-  document.addEventListener('touchmove', onDrag, { passive: false });
-  document.addEventListener('touchend', stopDrag);
+  document.addEventListener('mousemove',   onDrag);
+  document.addEventListener('mouseup',     stopDrag);
+  document.addEventListener('touchmove',   onDrag,    { passive: false });
+  document.addEventListener('touchend',    stopDrag);
   document.addEventListener('touchcancel', stopDrag);
 }
 
@@ -312,170 +344,204 @@ function onDrag(e) {
   if (!dragging) return;
   if (e.cancelable) e.preventDefault();
   const rect = timeline.getBoundingClientRect();
-  const dx = getClientX(e) - dragStartX;
-  const newTime = Math.max(0, Math.min(duration, dragStartTime + (dx / rect.width) * duration));
+  const dt   = ((getX(e) - dragStartX) / rect.width) * duration;
+  const t    = Math.max(0, Math.min(duration, dragStartTime + dt));
   if (dragging === 'start') {
-    startTime = Math.min(newTime, endTime - 0.1);
-    if (video.currentTime < startTime) video.currentTime = startTime;
+    startTime = Math.min(t, endTime - 0.1);
   } else {
-    endTime = Math.max(newTime, startTime + 0.1);
-    if (video.currentTime > endTime) video.currentTime = endTime;
+    endTime = Math.max(t, startTime + 0.1);
   }
   updateTimeline();
 }
 
 function stopDrag() {
   dragging = null;
-  document.removeEventListener('mousemove', onDrag);
-  document.removeEventListener('mouseup', stopDrag);
-  document.removeEventListener('touchmove', onDrag);
-  document.removeEventListener('touchend', stopDrag);
+  document.removeEventListener('mousemove',   onDrag);
+  document.removeEventListener('mouseup',     stopDrag);
+  document.removeEventListener('touchmove',   onDrag);
+  document.removeEventListener('touchend',    stopDrag);
   document.removeEventListener('touchcancel', stopDrag);
 }
 
-// Attach handle events
-handleStart.addEventListener('mousedown', e => startDrag(e, 'start'));
-handleStart.addEventListener('touchstart', e => startDrag(e, 'start'), { passive: false });
-handleEnd.addEventListener('mousedown', e => startDrag(e, 'end'));
-handleEnd.addEventListener('touchstart', e => startDrag(e, 'end'), { passive: false });
-timeline.addEventListener('mousedown', onTimelinePointer);
-timeline.addEventListener('touchend', onTimelinePointer);
+function onTimelinePointer(e) {
+  if (dragging) return;
+  const rect = timeline.getBoundingClientRect();
+  const t = Math.max(0, Math.min(duration, ((getX(e) - rect.left) / rect.width) * duration));
+  if (t >= startTime && t <= endTime) video.currentTime = t;
+}
 
-// Playback
-window.togglePlay = function() {
+handleStart.addEventListener('mousedown',  e => startDrag(e, 'start'));
+handleStart.addEventListener('touchstart', e => startDrag(e, 'start'), { passive: false });
+handleEnd.addEventListener('mousedown',    e => startDrag(e, 'end'));
+handleEnd.addEventListener('touchstart',   e => startDrag(e, 'end'),   { passive: false });
+timeline.addEventListener('mousedown',  onTimelinePointer);
+timeline.addEventListener('touchend',   onTimelinePointer);
+
+// ── Playback ──────────────────────────────────────────────────────────────────
+function togglePlay() {
   if (video.paused) {
     if (video.currentTime >= endTime || video.currentTime < startTime) video.currentTime = startTime;
-    video.play(); document.getElementById('btn-play').textContent = '⏸';
+    video.play();
+    document.getElementById('btn-play').textContent = '⏸';
   } else {
-    video.pause(); document.getElementById('btn-play').textContent = '▶';
+    video.pause();
+    document.getElementById('btn-play').textContent = '▶';
   }
-};
-window.goToStart = function() { video.pause(); video.currentTime = startTime; document.getElementById('btn-play').textContent = '▶'; };
-window.goToEnd = function() { video.pause(); video.currentTime = endTime; document.getElementById('btn-play').textContent = '▶'; };
+}
+function goToStart() { video.pause(); video.currentTime = startTime; document.getElementById('btn-play').textContent = '▶'; }
+function goToEnd()   { video.pause(); video.currentTime = endTime;   document.getElementById('btn-play').textContent = '▶'; }
 
-// Waveform
+// ── Waveform ──────────────────────────────────────────────────────────────────
 function drawWaveform() {
   const w = waveCanvas.offsetWidth || 800, h = waveCanvas.offsetHeight || 64;
   waveCanvas.width = w; waveCanvas.height = h;
-  const bars = Math.floor(w / 4);
   waveCtx.clearRect(0, 0, w, h);
+  const bars = Math.floor(w / 4);
   for (let i = 0; i < bars; i++) {
-    const x = (i / bars) * w;
-    const amp = 0.2 + Math.abs(Math.sin(i * 0.37) * Math.cos(i * 0.19) * 0.5 + Math.random() * 0.3);
+    const amp  = 0.2 + Math.abs(Math.sin(i * 0.37) * Math.cos(i * 0.19) * 0.5 + Math.random() * 0.3);
     const barH = amp * h * 0.8;
     waveCtx.fillStyle = 'rgba(255,255,255,0.12)';
-    waveCtx.fillRect(x, (h - barH) / 2, 2, barH);
+    waveCtx.fillRect((i / bars) * w, (h - barH) / 2, 2, barH);
   }
 }
 
-// Format helpers
+// ── Status helpers ────────────────────────────────────────────────────────────
+function setStatus(msg, p) {
+  const bar = document.getElementById('status-bar');
+  bar.classList.add('active');
+  document.getElementById('status-text').textContent = msg;
+  document.getElementById('status-pct').textContent  = p != null ? p + '%' : '';
+  document.getElementById('progress-fill').style.width = (p || 0) + '%';
+}
+function clearStatus(msg) {
+  document.getElementById('status-text').textContent = msg || '';
+  document.getElementById('progress-fill').style.width = '100%';
+  setTimeout(() => document.getElementById('status-bar').classList.remove('active'), 2500);
+}
+
+// ── Format helpers ────────────────────────────────────────────────────────────
 function fmt(t) {
-  const m = Math.floor(t / 60), s = (t % 60).toFixed(1).padStart(4, '0');
-  return String(m).padStart(2,'0') + ':' + s;
+  return String(Math.floor(t/60)).padStart(2,'0') + ':' + (t%60).toFixed(1).padStart(4,'0');
 }
 function fmtSimple(t) {
   return Math.floor(t/60) + ':' + String(Math.floor(t%60)).padStart(2,'0');
 }
 
-// ---- EXPORT ----
-window.exportClip = async function() {
+// ── Export ────────────────────────────────────────────────────────────────────
+async function exportClip() {
   const clipDur = endTime - startTime;
   if (clipDur < 0.1) { alert('Select a longer clip first.'); return; }
 
   const btn = document.getElementById('btn-export');
-  const statusBar = document.getElementById('status-bar');
-  const statusText = document.getElementById('status-text');
-  const statusPct = document.getElementById('status-pct');
-  const progressFill = document.getElementById('progress-fill');
-
   btn.disabled = true;
-  statusBar.classList.add('active');
-
-  // Wait for FFmpeg if still loading
-  if (!ffmpegReady) {
-    statusText.textContent = 'Loading FFmpeg (first time only)…';
-    progressFill.style.width = '10%';
-    statusPct.textContent = '...';
-    let waited = 0;
-    while (!ffmpegReady && waited < 30000) {
-      await new Promise(r => setTimeout(r, 300));
-      waited += 300;
-    }
-  }
-
-  if (!ffmpegReady) {
-    alert('FFmpeg failed to load. Please try refreshing the page.');
-    btn.disabled = false; statusBar.classList.remove('active');
-    return;
-  }
 
   try {
-    statusText.textContent = 'Reading file…';
-    progressFill.style.width = '15%';
-    statusPct.textContent = '15%';
+    const ok = await ensureFFmpeg();
+    if (!ok) {
+      // Fallback: blob slice (no re-encode, but may have offset issues — still fast)
+      setStatus('FFmpeg unavailable — using fallback export…', 50);
+      await fallbackExport();
+      return;
+    }
 
-    const ext = (currentFile.name.split('.').pop() || 'mp4').toLowerCase();
-    const inName = 'input.' + ext;
-    const outName = 'output.mp4';
+    setStatus('Reading file…', 18);
+    const ext     = (currentFile.name.split('.').pop() || 'mp4').toLowerCase();
+    const inName  = 'in.' + ext;
+    const outName = 'out.mp4';
 
-    // Write input file to FFmpeg FS
-    ffmpeg.on('progress', ({ progress }) => {
-      const pct = Math.round(15 + progress * 80);
-      progressFill.style.width = pct + '%';
-      statusPct.textContent = pct + '%';
-      statusText.textContent = 'Trimming… ' + pct + '%';
-    });
+    await ffmpegInstance.writeFile(inName, await window._fetchFile(currentFile));
+    setStatus('Trimming…', 22);
 
-    await ffmpeg.writeFile(inName, await fetchFile(currentFile));
-
-    statusText.textContent = 'Trimming…';
-    progressFill.style.width = '20%';
-    statusPct.textContent = '20%';
-
-    // Fast trim: -c copy skips re-encoding = near-instant
-    await ffmpeg.exec([
-      '-ss', String(startTime.toFixed(3)),
-      '-to', String(endTime.toFixed(3)),
+    await ffmpegInstance.exec([
+      '-ss', startTime.toFixed(3),
+      '-to', endTime.toFixed(3),
       '-i', inName,
       '-c', 'copy',
       '-avoid_negative_ts', 'make_zero',
+      '-movflags', '+faststart',
       outName
     ]);
 
-    statusText.textContent = 'Packaging…';
-    progressFill.style.width = '95%';
-    statusPct.textContent = '95%';
+    setStatus('Packaging…', 97);
+    const data = await ffmpegInstance.readFile(outName);
+    download(new Blob([data.buffer], { type: 'video/mp4' }), baseName() + '_clip.mp4');
 
-    const data = await ffmpeg.readFile(outName);
-    const blob = new Blob([data.buffer], { type: 'video/mp4' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    const baseName = currentFile.name.replace(/\.[^.]+$/, '');
-    a.download = baseName + '_clip.mp4';
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    // cleanup
+    try { await ffmpegInstance.deleteFile(inName); } catch(_) {}
+    try { await ffmpegInstance.deleteFile(outName); } catch(_) {}
 
-    // Cleanup FFmpeg FS
-    try { await ffmpeg.deleteFile(inName); } catch(e) {}
-    try { await ffmpeg.deleteFile(outName); } catch(e) {}
-
-    progressFill.style.width = '100%';
-    statusPct.textContent = '100%';
-    statusText.textContent = '✓ Done! Check your downloads.';
-    setTimeout(() => {
-      statusBar.classList.remove('active');
-      progressFill.style.width = '0%';
-    }, 3000);
-
-  } catch(err) {
+    clearStatus('✓ Exported successfully!');
+  } catch (err) {
     console.error(err);
-    statusText.textContent = '✗ Error: ' + err.message;
-    statusPct.textContent = '';
+    setStatus('✗ ' + (err.message || 'Export failed'), null);
   } finally {
     btn.disabled = false;
   }
-};
+}
+
+// Fallback: re-record with MediaRecorder (with audio)
+async function fallbackExport() {
+  return new Promise(resolve => {
+    const cap = document.createElement('video');
+    cap.src = objectURL; cap.muted = false; cap.volume = 1;
+    cap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px';
+    document.body.appendChild(cap);
+    cap.addEventListener('loadedmetadata', () => { cap.currentTime = startTime; }, { once: true });
+    cap.addEventListener('seeked', () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = cap.videoWidth || 1280; canvas.height = cap.videoHeight || 720;
+      const ctx = canvas.getContext('2d');
+      const vs  = canvas.captureStream(30);
+      let combined = vs;
+      try {
+        const ac  = new (window.AudioContext || window.webkitAudioContext)();
+        const src = ac.createMediaElementSource(cap);
+        const dst = ac.createMediaStreamDestination();
+        src.connect(dst); src.connect(ac.destination);
+        combined = new MediaStream([vs.getVideoTracks()[0], dst.stream.getAudioTracks()[0]]);
+      } catch(_) {}
+
+      let mime = 'video/webm;codecs=vp9,opus';
+      if (!MediaRecorder.isTypeSupported(mime)) mime = 'video/webm';
+      const rec    = new MediaRecorder(combined, { mimeType: mime, videoBitsPerSecond: 5e6 });
+      const chunks = [];
+      rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+      rec.onstop = () => {
+        document.body.removeChild(cap);
+        download(new Blob(chunks, { type: mime }), baseName() + '_clip.webm');
+        clearStatus('✓ Exported!');
+        resolve();
+      };
+
+      const clipDur = endTime - startTime;
+      rec.start(); cap.play();
+      let raf;
+      const draw = () => {
+        if (cap.currentTime >= endTime || cap.ended) {
+          rec.stop(); cap.pause(); cancelAnimationFrame(raf);
+          setStatus('Packaging…', 99); return;
+        }
+        const p = Math.round(((cap.currentTime - startTime) / clipDur) * 100);
+        setStatus('Recording (fallback)… ' + p + '%', p);
+        ctx.drawImage(cap, 0, 0, canvas.width, canvas.height);
+        raf = requestAnimationFrame(draw);
+      };
+      raf = requestAnimationFrame(draw);
+    }, { once: true });
+    cap.load();
+  });
+}
+
+function baseName() {
+  return (currentFile ? currentFile.name : 'clip').replace(/\.[^.]+$/, '');
+}
+
+function download(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
 </script>
 </body>
 </html>
