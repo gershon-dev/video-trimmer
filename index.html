@@ -331,6 +331,18 @@
 
   .handle:active { cursor: grabbing; }
 
+  @media (max-width: 600px) {
+    .handle { width: 32px; }
+    .handle-bar { width: 5px; }
+    .timeline-track { height: 72px; }
+    .timeline-section { padding: 12px 10px; }
+    .time-badges { gap: 4px; }
+    .time-badge { font-size: 11px; padding: 3px 7px; }
+    main { padding: 1rem; }
+    .controls { flex-wrap: wrap; gap: 8px; }
+    .hint { font-size: 11px; }
+  }
+
   .playhead-line {
     position: absolute;
     top: -6px;
@@ -559,7 +571,7 @@
         </div>
       </div>
 
-      <div class="timeline-track" id="timeline" onmousedown="onTrackClick(event)">
+      <div class="timeline-track" id="timeline" onmousedown="onTrackClick(event)" ontouchend="onTrackTouch(event)">
         <div class="track-bg">
           <canvas id="waveform-canvas"></canvas>
         </div>
@@ -567,10 +579,10 @@
         <div class="selection-mask-right" id="mask-right"></div>
         <div class="selection-highlight" id="sel-highlight"></div>
 
-        <div class="handle" id="handle-start" onmousedown="startDrag(event,'start')">
+        <div class="handle" id="handle-start" onmousedown="startDrag(event,'start')" ontouchstart="startDrag(event,'start')">
           <div class="handle-bar"></div>
         </div>
-        <div class="handle" id="handle-end" onmousedown="startDrag(event,'end')">
+        <div class="handle" id="handle-end" onmousedown="startDrag(event,'end')" ontouchstart="startDrag(event,'end')">
           <div class="handle-bar"></div>
         </div>
 
@@ -732,30 +744,46 @@
       `(${fmtSimple(startTime)} – ${fmtSimple(endTime)})`;
   }
 
+  function getClientX(e) {
+    if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
+    if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientX;
+    return e.clientX;
+  }
+
   function onTrackClick(e) {
     if (dragging) return;
     const rect = timeline.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    const t = pct * duration;
-    if (t >= startTime && t <= endTime) {
-      video.currentTime = t;
-    }
+    const pct = (getClientX(e) - rect.left) / rect.width;
+    const t = Math.max(0, Math.min(duration, pct * duration));
+    if (t >= startTime && t <= endTime) video.currentTime = t;
+  }
+
+  function onTrackTouch(e) {
+    if (dragging) return;
+    const rect = timeline.getBoundingClientRect();
+    const pct = (getClientX(e) - rect.left) / rect.width;
+    const t = Math.max(0, Math.min(duration, pct * duration));
+    if (t >= startTime && t <= endTime) video.currentTime = t;
   }
 
   function startDrag(e, which) {
     e.stopPropagation();
     e.preventDefault();
     dragging = which;
-    dragStartX = e.clientX;
+    dragStartX = getClientX(e);
     dragStartTime = which === 'start' ? startTime : endTime;
     document.addEventListener('mousemove', onDrag);
     document.addEventListener('mouseup', stopDrag);
+    document.addEventListener('touchmove', onDrag, { passive: false });
+    document.addEventListener('touchend', stopDrag);
+    document.addEventListener('touchcancel', stopDrag);
   }
 
   function onDrag(e) {
     if (!dragging) return;
+    if (e.cancelable) e.preventDefault();
     const rect = timeline.getBoundingClientRect();
-    const dx = e.clientX - dragStartX;
+    const dx = getClientX(e) - dragStartX;
     const dt = (dx / rect.width) * duration;
     const newTime = Math.max(0, Math.min(duration, dragStartTime + dt));
     if (dragging === 'start') {
@@ -772,6 +800,9 @@
     dragging = null;
     document.removeEventListener('mousemove', onDrag);
     document.removeEventListener('mouseup', stopDrag);
+    document.removeEventListener('touchmove', onDrag);
+    document.removeEventListener('touchend', stopDrag);
+    document.removeEventListener('touchcancel', stopDrag);
   }
 
   // Playback controls
